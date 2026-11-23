@@ -1,11 +1,11 @@
 {
-    "name": "farm_to_table",
-    "short_name": "farm_to_table",
+    "name": "Farm to Table - Digital Market",
+    "short_name": "Farm to Table",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#2E7D32",
+    "theme_color": "#2E7D32",
+    "description": "A digital marketplace connecting green vegetable farmers directly with traders and consumers in Tanzania.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
