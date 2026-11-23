@@ -2,20 +2,36 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(ownerId) {
+      return signedIn() && request.auth.uid == ownerId;
+    }
+
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    function isFarmer() {
+      return signedIn()
+        && firestore.get(
+             /databases/(default)/documents/users/$(request.auth.uid)
+           ).data.role == 'farmer';
+    }
+
     match /profiles/{userId}/{fileName} {
       allow read: if true;
-      allow write: if request.auth != null
-        && request.auth.uid == userId
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow create, update: if isOwner(userId) && isValidImage();
+      allow delete: if isOwner(userId);
     }
 
     match /products/{farmerId}/{fileName} {
       allow read: if true;
-      allow write: if request.auth != null
-        && request.auth.uid == farmerId
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow create, update: if isFarmer() && isOwner(farmerId) && isValidImage();
+      allow delete: if isFarmer() && isOwner(farmerId);
     }
   }
 }

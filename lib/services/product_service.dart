@@ -41,14 +41,13 @@ class ProductService {
   }
 
   Future<ProductModel?> getProduct(String productId) async {
-    final DocumentSnapshot<Map<String, dynamic>> document = await _products
-        .doc(productId)
-        .get();
-    final Map<String, dynamic>? data = document.data();
-    if (!document.exists || data == null) {
+    final DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await _products.doc(productId).get();
+    final Map<String, dynamic>? data = snapshot.data();
+    if (!snapshot.exists || data == null) {
       return null;
     }
-    return ProductModel.fromMap(data, docId: document.id);
+    return ProductModel.fromMap(data, docId: snapshot.id);
   }
 
   Future<String> createProduct(ProductModel product) async {
@@ -57,21 +56,22 @@ class ProductService {
     return reference.id;
   }
 
-  Future<void> updateProduct(ProductModel product) async {
-    final Map<String, dynamic> data = product.toMap();
-    data['updatedAt'] = Timestamp.now();
-    await _products.doc(product.id).update(data);
+  Future<void> updateProduct(String productId, Map<String, dynamic> data) async {
+    final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
+    payload['updatedAt'] = FieldValue.serverTimestamp();
+    await _products.doc(productId).update(payload);
+  }
+
+  Future<void> toggleAvailability(String productId, bool currentStatus) async {
+    await setAvailability(productId, !currentStatus);
+  }
+
+  Future<void> setAvailability(String productId, bool isAvailable) async {
+    await updateProduct(productId, <String, dynamic>{'isAvailable': isAvailable});
   }
 
   Future<void> deleteProduct(String productId) async {
     await _products.doc(productId).delete();
-  }
-
-  Future<void> setAvailability(String productId, bool isAvailable) async {
-    await _products.doc(productId).update({
-      'isAvailable': isAvailable,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
   }
 
   List<ProductModel> _mapDocuments(

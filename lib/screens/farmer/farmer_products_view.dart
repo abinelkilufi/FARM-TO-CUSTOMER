@@ -50,7 +50,7 @@ class _FarmerProductsViewState extends State<FarmerProductsView> {
     }
 
     try {
-      await ProductService().setAvailability(product.id, !product.isAvailable);
+      await ProductService().toggleAvailability(product.id, product.isAvailable);
       if (!mounted) {
         return;
       }

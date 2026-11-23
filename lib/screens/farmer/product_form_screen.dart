@@ -168,7 +168,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           isAvailable: isAvailable,
           updatedAt: now,
         );
-        await ProductService().updateProduct(product);
+        await ProductService().updateProduct(widget.product!.id, product.toMap());
       }
 
       if (!mounted) {
@@ -359,9 +359,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                               height: 22,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.4,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
                           : Text(
